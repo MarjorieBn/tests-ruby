@@ -1,53 +1,19 @@
-require_relative '../lib/06_pig_latin'
-
-describe "#translate" do
-
-  it "translates a word beginning with a vowel" do
-    s = translate("apple")
-    expect(s).to eq("appleay")
+def translate(sentence)
+  words = sentence.split.map do |word|
+    translate_word(word)
   end
+  words.join(" ")
+end
 
-  it "translates a word beginning with a consonant" do
-    s = translate("banana")
-    expect(s).to eq("ananabay")
+def translate_word(word)
+  vowels = %w[a e i o u]
+
+  # Gère les cas spéciaux avec 'qu' et 'sch'
+  if word.start_with?(*vowels)
+    word + "ay"
+  else
+    consonant_cluster = word[/\A([^aeiou]*qu|[^aeiou]+)(?=[aeiou])/]
+    consonant_cluster ||= word[/\A[^aeiou]+/]
+    word[consonant_cluster.length..-1] + consonant_cluster + "ay"
   end
-
-  it "translates a word beginning with two consonants" do
-    s = translate("cherry")
-    expect(s).to eq("errychay")
-  end
-
-  it "translates two words" do
-    s = translate("eat pie")
-    expect(s).to eq("eatay iepay")
-  end
-
-  it "translates a word beginning with three consonants" do
-    expect(translate("three")).to eq("eethray")
-  end
-
-  it "counts 'sch' as a single phoneme" do
-    s = translate("school")
-    expect(s).to eq("oolschay")
-  end
-
-  it "counts 'qu' as a single phoneme" do
-    s = translate("quiet")
-    expect(s).to eq("ietquay")
-  end
-
-  it "counts 'qu' as a consonant even when it's preceded by a consonant" do
-    s = translate("square")
-    expect(s).to eq("aresquay")
-  end
-
-  it "translates many words" do
-    s = translate("the quick brown fox")
-    expect(s).to eq("ethay ickquay ownbray oxfay")
-  end
-
-  # Test-driving bonus:
-  # * write a test asserting that capitalized words are still capitalized (but with a different initial capital letter, of course)
-  # * retain the punctuation from the original phrase
-
 end
